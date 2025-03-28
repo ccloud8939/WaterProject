@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Project } from "./Project";
+import { Project } from "../Project";
 
 
-function ProjectList({selectedCategories}: {selectedCategories: string[] }) {
+function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageNum, setPageNum] = useState<number>(1);
@@ -13,11 +13,11 @@ function ProjectList({selectedCategories}: {selectedCategories: string[] }) {
     useEffect(() => {
         const fetchProjects = async () => {
             const categoryParams = selectedCategories
-            .map((cat: string | number | boolean) => `projectTypes=${encodeURIComponent(cat)}`)
-            .join('&');
+                .map((cat: string | number | boolean) => `projectTypes=${encodeURIComponent(cat)}`)
+                .join('&');
 
             // this is where it is getting the data from
-            const response = await fetch(`http://localhost:4000/api/Water/AllProjects?pageHowMany=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : '' }`);
+            const response = await fetch(`http://localhost:4000/api/Water/AllProjects?pageHowMany=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : ''}`);
             //this variable holds the data
             const data = await response.json();
             //sets the project with the updated data

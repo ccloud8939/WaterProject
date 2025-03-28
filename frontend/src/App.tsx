@@ -1,12 +1,12 @@
 import './App.css'
+import ProjectsPage from './pages/ProjectsPage';
 
 function App() {
-  
   return (
-    <>
-    <ProjectsList/>
+    <> 
+    <ProjectsPage />
     </>
   );
 }
 
-export default App
+export default App;
