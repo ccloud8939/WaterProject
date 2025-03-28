@@ -2,19 +2,22 @@ import { useEffect, useState } from "react";
 import { Project } from "./Project";
 
 
-function ProjectList()
-{
+function ProjectList({selectedCategories}: {selectedCategories: string[] }) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [pageSize, setPageSize] = useState<number>(10);
     const [pageNum, setPageNum] = useState<number>(1);
     const [totalItems, setTotalItems] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
-    
+
     // useEffect only grabs the data when it is needed instead of constantly going back and grabbing it 
     useEffect(() => {
         const fetchProjects = async () => {
+            const categoryParams = selectedCategories
+            .map((cat: string | number | boolean) => `projectTypes=${encodeURIComponent(cat)}`)
+            .join('&');
+
             // this is where it is getting the data from
-            const response =await fetch(`http://localhost:4000/api/Water/AllProjects?pageHowMany=${pageSize}&pageNum=${pageNum}`);
+            const response = await fetch(`http://localhost:4000/api/Water/AllProjects?pageHowMany=${pageSize}&pageNum=${pageNum}${selectedCategories.length ? `&${categoryParams}` : '' }`);
             //this variable holds the data
             const data = await response.json();
             //sets the project with the updated data
@@ -23,54 +26,52 @@ function ProjectList()
             setTotalPages(Math.ceil(totalItems / pageSize));
         };
 
-    fetchProjects();
-}, [pageSize, pageNum, totalItems]);
-    return(
+        fetchProjects();
+    }, [pageSize, pageNum, totalItems, selectedCategories]);
+    return (
         <>
-            <h1>Water Projects</h1>
-            <br />
             {projects.map((p) => (
                 <div id="projectCard" className="card" key={p.projectId}>
                     <h3 className="card-title">{p.projectName}</h3>
                     <div className="card-body">
-                    <ul className="list-unstyled">
-                        <li><strong>Project Type:</strong> {p.projectType}</li>
-                        <li><strong>Regional Program:</strong> {p.projectRegionalProgram}</li>
-                        <li><strong>Impact:</strong> {p.projectImpact} Indivduals Served</li>
-                        <li><strong>Project Phase:</strong> {p.projectPhase}</li>
-                        <li><strong>Project Status:</strong> {p.projectFunctionalityStatus}</li>
-                    </ul>
-                    
-                </div>
-                </div>
-    ))}
+                        <ul className="list-unstyled">
+                            <li><strong>Project Type:</strong> {p.projectType}</li>
+                            <li><strong>Regional Program:</strong> {p.projectRegionalProgram}</li>
+                            <li><strong>Impact:</strong> {p.projectImpact} Indivduals Served</li>
+                            <li><strong>Project Phase:</strong> {p.projectPhase}</li>
+                            <li><strong>Project Status:</strong> {p.projectFunctionalityStatus}</li>
+                        </ul>
 
-    <button disabled={pageNum === 1} onClick={() => setPageNum(pageNum - 1)}>Previous</button>
-     
+                    </div>
+                </div>
+            ))}
 
-    {[...Array(totalPages)].map((_, i) => (
-        <button key={i + 1} onClick={() => setPageNum(i + 1)} disabled = {pageNum === i + 1}>
-            {i + 1}
-        </button>
-    ))}
-    <button disabled={pageNum === totalPages} onClick={() => 
-        setPageNum(pageNum + 1)} >Next</button>
-    
-    <br />
-    <label>
-        Results per page:
-        <select 
-        value={pageSize} 
-        onChange={(p) => {
-            setPageSize(Number(p.target.value))
-            setPageNum(1);
-        }}
-        >
-            <option value='5'>5</option>
-            <option value='10'>10</option>
-            <option value='20'>20</option>
-        </select>
-    </label>
+            <button disabled={pageNum === 1} onClick={() => setPageNum(pageNum - 1)}>Previous</button>
+
+
+            {[...Array(totalPages)].map((_, i) => (
+                <button key={i + 1} onClick={() => setPageNum(i + 1)} disabled={pageNum === i + 1}>
+                    {i + 1}
+                </button>
+            ))}
+            <button disabled={pageNum === totalPages} onClick={() =>
+                setPageNum(pageNum + 1)} >Next</button>
+
+            <br />
+            <label>
+                Results per page:
+                <select
+                    value={pageSize}
+                    onChange={(p) => {
+                        setPageSize(Number(p.target.value))
+                        setPageNum(1);
+                    }}
+                >
+                    <option value='5'>5</option>
+                    <option value='10'>10</option>
+                    <option value='20'>20</option>
+                </select>
+            </label>
         </>
     );
 }
